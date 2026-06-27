@@ -26,7 +26,7 @@ $error = "";
 
                 $user = mysqli_fetch_assoc($query);
 
-                if($password == $user['password']){
+                if(password_verify($password,$user['password'])){
 
                     $_SESSION['id_pengguna'] = $user['id_pengguna'];
                     $_SESSION['nama'] = $user['nama'];
@@ -611,18 +611,17 @@ $error = "";
             setTimeout(() => location.href = href, 400);
         });
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <?php if (isset($_SESSION['success'])) : ?>
-            <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: '<?= $_SESSION['success']; ?>',
-                confirmButtonText: 'OK'
-            });
-            </script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: '<?= $_SESSION['success']; ?>',
+            confirmButtonText: 'OK'
+        });
+        </script>
         <?php unset($_SESSION['success']); ?>
-        <?php endif; ?>
+        <?php endif; ?>>
 </body>
 </html>

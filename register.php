@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'connection.php';
+require 'koneksi.php';
 
 // Jika sudah login, redirect ke dashboard
 if (isset($_SESSION['id_pengguna'])) {
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Anda harus menyetujui syarat & ketentuan.';
     } else {
         // Cek apakah email sudah terdaftar menggunakan Prepared Statement (Aman dari SQL Injection)
-        $stmt_cek = mysqli_prepare($conn, "SELECT id_pengguna FROM pengguna WHERE email = ?");
+        $stmt_cek = mysqli_prepare($koneksi, "SELECT id_pengguna FROM pengguna WHERE email = ?");
         mysqli_stmt_bind_param($stmt_cek, "s", $email);
         mysqli_stmt_execute($stmt_cek);
         mysqli_stmt_store_result($stmt_cek);
@@ -45,17 +45,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Hash password dan simpan data pengguna baru
             $hashed = password_hash($password, PASSWORD_DEFAULT);
-            $sql = "INSERT INTO pengguna (nama, email, no_hp, alamat, role, password) VALUES (?, ?, ?, ?, 'user', ?)";
+            $sql = "INSERT INTO pengguna (nama, email, no_hp, alamat, role, password) VALUES (?, ?, ?, ?, 'pembeli', ?)";
             
-            $stmt_insert = mysqli_prepare($conn, $sql);
+            $stmt_insert = mysqli_prepare($koneksi, $sql);
             mysqli_stmt_bind_param($stmt_insert, "sssss", $nama, $email, $no_hp, $alamat, $hashed);
 
             if (mysqli_stmt_execute($stmt_insert)) {
                 mysqli_stmt_close($stmt_insert);
-                header("location: login.php?success=1");
+                $_SESSION['success'] = "Registrasi berhasil. Silakan login.";
+                header("Location: login.php");
                 exit;
             } else {
-                $error = 'Gagal mendaftar: ' . mysqli_error($conn);
+                $error = 'Gagal mendaftar: ' . mysqli_error($koneksi);
             }
         }
     }

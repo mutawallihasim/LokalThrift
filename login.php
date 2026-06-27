@@ -1,9 +1,59 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<!DOCTYPE html>
-<html lang="id">
+<?php
+session_start();
+require 'koneksi.php';
 
+if(isset($_SESSION['id_pengguna'])){
+    header("Location: dashboard.php");
+    exit;
+}
+
+$error = "";
+
+    if(isset($_POST['login'])){
+
+        $email = mysqli_real_escape_string($koneksi, trim($_POST['email']));
+        $password = mysqli_real_escape_string($koneksi, trim($_POST['password']));
+
+        // Validasi input kosong
+        if(empty($email) || empty($password)){
+            $error = "Email dan password harus diisi.";
+        } else {
+
+            $query = mysqli_query($koneksi,
+                "SELECT * FROM pengguna WHERE email='$email'");
+
+            if(mysqli_num_rows($query) > 0){
+
+                $user = mysqli_fetch_assoc($query);
+
+                if($password == $user['password']){
+
+                    $_SESSION['id_pengguna'] = $user['id_pengguna'];
+                    $_SESSION['nama'] = $user['nama'];
+                    $_SESSION['role'] = $user['role'];
+
+                    if($user['role'] == "admin"){
+                        header("Location: admin/dashboard.php");
+                    } elseif($user['role'] == "penjual"){
+                        header("Location: seller/dashboard.php");
+                    } else {
+                        header("Location: dashboard.php");
+                    }
+                    exit;
+
+                } else {
+                    $error = "Password salah!";
+                }
+
+            } else {
+                $error = "Email tidak ditemukan!";
+            }
+        }
+    }
+?>
+
+<!DOCTYPE html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -460,18 +510,14 @@
                 <p class="card-sub" style="margin-bottom:0;">Masuk untuk melanjutkan perjalanan thrift-mu.</p>
             </div>
             
-            @if ($errors->any())
-                <div class="alert alert-error">
-                    <ul style="margin:0;padding-left:18px;">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+            <?php if($error!="") : ?>
+                <div class="alert alert-danger">
+                    <?= $error ?>
                 </div>
-            @endif
+            <?php endif; ?>
 
-            <form method="POST" action="{{ route('login.process') }}">
-            @csrf
+            <form method="POST" action="login.php">
+            
                 <div class="field">
                     <label>Email</label>
                     <div class="input-wrap">
@@ -479,7 +525,7 @@
                             <rect x="2" y="4" width="20" height="16" rx="3" />
                             <path d="m2 7 10 7 10-7" />
                         </svg>
-                        <input type="email" name="email" placeholder="Masukkan email"value="{{ old('email') }}">
+                        <input type="email" name="email" placeholder="Masukkan email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
                     </div>
                 </div>
 
@@ -508,7 +554,7 @@
                     <a href="forgot_password.php" class="forgot-link" id="toForgot">Forgot Password?</a>
                 </div>
 
-                <button type="submit" class="btn-primary">Login</button>
+                <button type="submit" class="btn-primary" name="login">Login</button>
             </form>
 
             <div class="divider">atau masuk dengan</div>
@@ -531,7 +577,7 @@
             </button>
 
             <div class="switch-link">
-                Belum punya akun? <a href="/register" id="toRegister">Daftar di sini</a>
+                Belum punya akun? <a href="register.php" id="toRegister">Daftar di sini</a>
             </div>
         </div>
 
@@ -567,18 +613,16 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @if(session('success'))
-    <script>
-    Swal.fire({
-        icon: 'success',
-        title: 'Berhasil',
-        text: 'Registrasi berhasil, silakan login!',
-        confirmButtonText: 'OK'
-    });
-    </script>
-    @endif
-   
-</body>
-
+        <?php if (isset($_SESSION['success'])) : ?>
+            <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '<?= $_SESSION['success']; ?>',
+                confirmButtonText: 'OK'
+            });
+            </script>
+        <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
 </body>
 </html>

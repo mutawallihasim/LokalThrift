@@ -1,50 +1,61 @@
 <?php
-// 1. Mengambil pesanan dinamis dari session 'orders_history' yang diisi dari checkout
-$dynamicOrders = session('orders_history', []);
+session_start();
+require 'koneksi.php';
 
-// 2. Jika session dinamis masih kosong (belum ada transaksi baru), kita siapkan data default sebagai sampel awal
-if (empty($dynamicOrders)) {
-    $cartItems = [
-        [
-            'invoice' => 'LT240S170001',
-            'date' => '17 Mei 2026 • 10:30',
-            'status' => 'diproses',
-            'total' => 'Rp 210.000',
-            'jumlah_barang' => 3,
-            'images' => [
-                'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=150',
-                'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=150',
-                'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=150'
-            ]
-        ],
-        [
-            'invoice' => 'LT240S140023',
-            'date' => '14 Mei 2026 • 14:15',
-            'status' => 'dikirim',
-            'total' => 'Rp 125.000',
-            'jumlah_barang' => 1,
-            'images' => [
-                'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=150'
-            ]
-        ],
-        [
-            'invoice' => 'LT240S100098',
-            'date' => '10 Mei 2026 • 09:15',
-            'status' => 'selesai',
-            'total' => 'Rp 120.000',
-            'jumlah_barang' => 2,
-            'images' => [
-                'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=150',
-                'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=150'
-            ]
-        ]
-    ];
-} else {
-    // Jika user baru saja klik "Pesan Sekarang", gunakan data dari session terbaru
-    $cartItems = $dynamicOrders;
+// Redirect ke login jika belum masuk
+if (!isset($_SESSION['id_pengguna'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$id_pengguna = (int) $_SESSION['id_pengguna'];
+
+// Buat tabel jika belum ada
+mysqli_query($koneksi, "CREATE TABLE IF NOT EXISTS `pesanan` (
+  `id_pesanan`   INT AUTO_INCREMENT PRIMARY KEY,
+  `id_pengguna`  INT NOT NULL,
+  `invoice`      VARCHAR(30) NOT NULL UNIQUE,
+  `status`       ENUM('diproses','dikirim','selesai','dibatalkan') NOT NULL DEFAULT 'diproses',
+  `total`        INT NOT NULL DEFAULT 0,
+  `metode_bayar` VARCHAR(50) DEFAULT NULL,
+  `kurir`        VARCHAR(100) DEFAULT NULL,
+  `alamat`       TEXT DEFAULT NULL,
+  `created_at`   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+mysqli_query($koneksi, "CREATE TABLE IF NOT EXISTS `pesanan_item` (
+  `id_item`    INT AUTO_INCREMENT PRIMARY KEY,
+  `id_pesanan` INT NOT NULL,
+  `nama`       VARCHAR(200) NOT NULL,
+  `varian`     VARCHAR(100) DEFAULT NULL,
+  `harga`      INT NOT NULL DEFAULT 0,
+  `gambar`     TEXT DEFAULT NULL,
+  FOREIGN KEY (`id_pesanan`) REFERENCES `pesanan`(`id_pesanan`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+// Ambil semua pesanan milik user beserta item-nya
+$pesananList = [];
+$qPesanan = mysqli_query($koneksi,
+    "SELECT * FROM pesanan WHERE id_pengguna = $id_pengguna ORDER BY created_at DESC"
+);
+
+if ($qPesanan) {
+    while ($row = mysqli_fetch_assoc($qPesanan)) {
+        $id_p  = (int) $row['id_pesanan'];
+        $items = [];
+        $qItem = mysqli_query($koneksi,
+            "SELECT * FROM pesanan_item WHERE id_pesanan = $id_p"
+        );
+        if ($qItem) {
+            while ($item = mysqli_fetch_assoc($qItem)) {
+                $items[] = $item;
+            }
+        }
+        $row['items'] = $items;
+        $pesananList[] = $row;
+    }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -52,327 +63,335 @@ if (empty($dynamicOrders)) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pesanan Saya - LokalThrift</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Helvetica Neue',Arial,sans-serif; }
+    body { background:#eef5fc; min-height:100vh; display:flex; flex-direction:column; }
 
-    body {
-      background: #f4f8fc;
-      color: #0d1c2e;
-      min-height: 100vh;
-    }
-
-    /* NAVBAR UTAMA */
-    .top-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 18px 5%;
-      background-color: #ffffff;
-      border-bottom: 1px solid #eef2f7;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: #0d1c2e;
-      font-weight: 700;
-      font-size: 20px;
-    }
-
-    .brand i {
-      color: #2a85ff;
-    }
-
-    /* CONTAINER KONTEN */
-    .container {
-      width: 90%;
-      max-width: 850px;
-      margin: 30px auto;
-    }
-
-    .btn-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: #556980;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
-    /* KARTU UTAMA DAFTAR PESANAN */
-    .order-card-container {
-      background: white;
-      border-radius: 16px;
-      border: 1px solid #eef2f7;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.01);
-      padding: 5px 20px 20px 20px;
-    }
-
-    /* TAB NAVIGASI UTAMA */
-    .tab-navigation {
-      display: flex;
-      border-bottom: 1px solid #eef2f7;
-      margin-bottom: 20px;
-    }
-
-    .tab-item {
-      padding: 18px 25px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #7d8c9e;
-      background: none;
-      border: none;
-      position: relative;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-
-    .tab-item:hover {
-      color: #2a85ff;
-    }
-
-    .tab-item.active {
-      color: #2a85ff;
-    }
-
-    .tab-item.active::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
+    /* BOTTOM NAVBAR */
+    .navbar {
+      position: fixed;
+      bottom: 0;
       left: 0;
+      right: 0;
       width: 100%;
-      height: 3px;
-      background: #2a85ff;
-      border-radius: 3px 3px 0 0;
-    }
-
-    /* DAFTAR ITEM PESANAN */
-    .order-list {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .order-box {
-      border: 1px solid #e2edf7;
-      border-radius: 16px;
-      padding: 20px;
       background: white;
       display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0 14px 0;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+      z-index: 999;
+    }
+
+    .nav-item {
+      display: flex;
       flex-direction: column;
-      gap: 15px;
-      position: relative;
-    }
-
-    /* HEADER KARTU PESANAN */
-    .order-box-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    .invoice-info h3 {
-      font-size: 15px;
-      font-weight: 700;
-      color: #0d1c2e;
-      margin-bottom: 4px;
-    }
-
-    .invoice-info p {
-      font-size: 13px;
-      color: #7d8c9e;
-    }
-
-    /* BADGES STATUS WARNA */
-    .badge-status {
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .status-diproses {
-      background: #fff6e9;
-      color: #ffa800;
-    }
-
-    .status-dikirim {
-      background: #eef5fc;
-      color: #2a85ff;
-    }
-
-    .status-selesai {
-      background: #ebf9f1;
-      color: #10b981;
-    }
-
-    /* BODY KARTU: BANJARAN FOTO PRODUK MINI */
-    .order-box-body {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-    }
-
-    .product-images-row {
-      display: flex;
-      gap: 12px;
-    }
-
-    .mini-img-wrapper {
-      width: 80px;
-      height: 80px;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #f8fbfe;
-      border: 1px solid #eef2f7;
-    }
-
-    .mini-img-wrapper img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* RINGKASAN HARGA */
-    .price-summary {
-      text-align: left;
-      flex: 1;
-      padding-left: 20px;
-    }
-
-    .price-summary p {
-      font-size: 13px;
-      color: #7d8c9e;
-      margin-bottom: 2px;
-    }
-
-    .price-summary h4 {
-      font-size: 15px;
-      font-weight: 700;
-      color: #0d1c2e;
-    }
-
-    /* BUTTON LINK DETAIL */
-    .btn-detail-link {
-      font-size: 13px;
-      font-weight: 700;
-      color: #2a85ff;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .btn-detail-link:hover {
-      text-decoration: underline;
-      color: #1b6fd1;
-    }
-
-    /* EMPTY STATE JIKA KATEGORI KOSONG */
-    .empty-tab-state {
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      padding: 40px 20px;
-      color: #8fa0b5;
-      display: none;
+      font-size: 11px;
+      font-weight: bold;
+      color: #777;
+      text-decoration: none;
+      flex: 1;
+      gap: 4px;
+    }
+
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 0;
+      display: block;
+    }
+
+    .nav-item.active { color: #2a85ff; }
+    .nav-item.nav-logout { color: #e53935; }
+    .nav-item.nav-logout:hover { color: #c62828; }
+
+    .sidebar-logo { display: none; }
+
+    @media (min-width: 769px) {
+      body { flex-direction: row; }
+
+      .navbar {
+        position: fixed;
+        top: 0; left: 0; bottom: 0; right: auto;
+        width: 160px; height: 100vh;
+        flex-direction: column; justify-content: flex-start; align-items: stretch;
+        padding: 20px 0 20px 0;
+        border-top-left-radius: 0; border-top-right-radius: 0;
+        border-right: 1px solid #e0ecf8; box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+        gap: 4px;
+      }
+
+      .sidebar-logo {
+        display: flex; align-items: center; justify-content: center; gap: 6px;
+        font-size: 13px; font-weight: 800; color: #2a85ff;
+        padding: 0 8px 18px 8px; border-bottom: 1px solid #e0ecf8;
+        margin-bottom: 8px; text-align: center;
+      }
+
+      .nav-item {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; padding: 12px 8px; border-radius: 12px; margin: 2px 8px;
+        font-size: 11px; font-weight: 600; flex: none;
+        gap: 5px; transition: background 0.2s, color 0.2s;
+      }
+
+      .nav-item:hover { background: #eef5fc; color: #2a85ff; }
+      .nav-item.active { background: #ddeeff; color: #2a85ff; }
+      .nav-item.nav-logout { margin-top: auto; color: #e53935; }
+      .nav-item.nav-logout:hover { background: #fff0f0; color: #c62828; }
+
+      .nav-item i { font-size: 22px; display: block; margin-bottom: 0; width: auto; }
+
+      .page-wrapper { margin-left: 160px; width: 100%; }
+      .main { padding: 30px 40px 40px; max-width: 860px; }
+      .page-title { text-align: left; }
+    }
+
+    /* ── TAB FILTER ── */
+    .tabs {
+      display:flex; gap:0;
+      background:white; border-radius:14px;
+      padding:4px; margin-bottom:20px;
+      box-shadow:0 4px 16px rgba(0,0,0,0.05);
+      overflow-x:auto;
+    }
+    .tabs::-webkit-scrollbar { display:none; }
+    .tab-btn {
+      flex:1; padding:10px 8px; border:none; background:none;
+      font-size:13px; font-weight:600; color:#8fa3b8;
+      border-radius:10px; cursor:pointer; white-space:nowrap;
+      transition:background 0.2s, color 0.2s;
+      min-width:60px;
+    }
+    .tab-btn.active {
+      background:#2a85ff; color:white;
+    }
+    .tab-btn:hover:not(.active) { color:#2a85ff; }
+
+    /* ── PESANAN CARD ── */
+    .pesanan-card {
+      background:white; border-radius:16px; padding:18px 20px;
+      margin-bottom:14px; box-shadow:0 4px 16px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+      display:flex; justify-content:space-between;
+      align-items:flex-start; margin-bottom:14px;
+    }
+    .invoice { font-size:15px; font-weight:800; color:#0d1c2e; }
+    .tanggal { font-size:12px; color:#8fa3b8; margin-top:3px; }
+
+    /* Status badge */
+    .badge {
+      font-size:12px; font-weight:700; padding:5px 12px;
+      border-radius:20px; flex-shrink:0;
+    }
+    .badge-diproses  { background:#fff4e0; color:#f5a623; }
+    .badge-dikirim   { background:#e0f0ff; color:#2a85ff; }
+    .badge-selesai   { background:#e6f9f0; color:#10b981; }
+    .badge-dibatalkan{ background:#fff0f0; color:#e53935; }
+
+    /* Foto produk */
+    .foto-row {
+      display:flex; gap:8px; margin-bottom:14px;
+      overflow-x:auto;
+    }
+    .foto-row::-webkit-scrollbar { display:none; }
+    .foto-item {
+      width:72px; height:72px; border-radius:12px;
+      overflow:hidden; flex-shrink:0; background:#f0f6fc;
+    }
+    .foto-item img {
+      width:100%; height:100%; object-fit:cover;
+    }
+    .foto-more {
+      width:72px; height:72px; border-radius:12px;
+      background:#eef5fc; display:flex; align-items:center;
+      justify-content:center; font-size:13px; font-weight:700;
+      color:#2a85ff; flex-shrink:0;
+    }
+
+    /* Footer card */
+    .card-footer {
+      display:flex; justify-content:space-between;
+      align-items:center; padding-top:12px;
+      border-top:1px solid #f0f6fc;
+    }
+    .jumlah { font-size:13px; color:#8fa3b8; }
+    .total  { font-size:14px; font-weight:800; color:#0d1c2e; margin-top:2px; }
+    .btn-detail {
+      font-size:13px; font-weight:700; color:#2a85ff;
+      text-decoration:none; padding:6px 14px;
+      border:1.5px solid #c8dff5; border-radius:10px;
+      transition:background 0.2s;
+    }
+    .btn-detail:hover { background:#eef5fc; }
+
+    /* ── EMPTY STATE ── */
+    .empty {
+      text-align:center; padding:60px 20px; color:#aab;
+    }
+    .empty i { font-size:48px; color:#c8dff5; display:block; margin-bottom:14px; }
+    .empty p  { font-size:14px; }
+
+    /* ── PAGE WRAPPER ── */
+    .page-wrapper { display:flex; flex:1; }
+
+    /* ── MAIN ── */
+    .main {
+      width:100%; max-width:720px;
+      margin:0 auto;
+      padding:24px 16px 110px;
+    }
+
+    .page-title {
+      font-size:20px; font-weight:800; color:#0d1c2e;
+      text-align:center; margin-bottom:20px;
     }
   </style>
 </head>
 <body>
 
-  <div class="top-nav">
-    <a href="/web-baru" class="brand">
-      <i class="fa-solid fa-cloud-bolt"></i> <span>LokalThrift</span>
-    </a>
+<div class="navbar">
+  <div class="sidebar-logo">
+    <img src="Logo.svg" alt="LokalThrift" style="width:140px; height:auto; display:block; margin:0 auto;">
+  </div>
+  <a href="home.php" class="nav-item">
+    <i class="fa-solid fa-house"></i><span>Beranda</span>
+  </a>
+  <a href="keranjang.php" class="nav-item">
+    <i class="fa-solid fa-cart-shopping"></i><span>Keranjang</span>
+  </a>
+  <a href="pesanan.php" class="nav-item active">
+    <i class="fa-solid fa-bag-shopping"></i><span>Pesanan</span>
+  </a>
+  <a href="cek_toko.php" class="nav-item">
+    <i class="fa-solid fa-shop"></i><span>Toko</span>
+  </a>
+  <a href="akun.php" class="nav-item">
+    <i class="fa-solid fa-user"></i><span>Akun</span>
+  </a>
+  <a href="chat.php" class="nav-item">
+    <i class="fa-solid fa-message"></i><span>Chat</span>
+  </a>
+  <?php if(isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+  <a href="admin/dashboard.php" class="nav-item">
+    <i class="fa-solid fa-chart-pie"></i><span>Admin</span>
+  </a>
+  <?php endif; ?>
+  <a href="logout.php" class="nav-item nav-logout">
+    <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+  </a>
+</div>
+
+<div class="page-wrapper">
+<div class="main">
+
+  <div class="page-title">Pesanan Saya</div>
+
+  <!-- TAB FILTER -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="filterTab(this,'semua')">Semua</button>
+    <button class="tab-btn" onclick="filterTab(this,'diproses')">Diproses</button>
+    <button class="tab-btn" onclick="filterTab(this,'dikirim')">Dikirim</button>
+    <button class="tab-btn" onclick="filterTab(this,'selesai')">Selesai</button>
+    <button class="tab-btn" onclick="filterTab(this,'dibatalkan')">Dibatalkan</button>
   </div>
 
-  <div class="container">
-    <a href="/web-baru" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard</a>
-    
-    <div class="order-card-container">
-      
-      <div class="tab-navigation">
-        <button class="tab-item active" onclick="filterStatus('all', this)">Semua</button>
-        <button class="tab-item" onclick="filterStatus('diproses', this)">Diproses</button>
-        <button class="tab-item" onclick="filterStatus('dikirim', this)">Dikirim</button>
-        <button class="tab-item" onclick="filterStatus('selesai', this)">Selesai</button>
-        <button class="tab-item" onclick="filterStatus('dibatalkan', this)">Dibatalkan</button>
-      </div>
+  <!-- LIST PESANAN -->
+  <div id="pesanan-list"></div>
 
-      <div class="order-list">
-        <?php foreach($cartItems as $box): ?>
-          <div class="order-box" data-status="<?= $box['status'] ?>">
-            <div class="order-box-header">
-              <div class="invoice-info">
-                <h3><?= $box['invoice'] ?></h3>
-                <p><?= $box['date'] ?></p>
-              </div>
-              <span class="badge-status status-<?= $box['status'] ?>"><?= ucfirst($box['status']) ?></span>
+</div>
+</div>
+
+<script>
+  // ── DATA DARI PHP (realtime dari database) ──
+  const semuaPesanan = <?= json_encode(array_map(function($p) {
+    return [
+      'id_pesanan' => $p['id_pesanan'],
+      'invoice' => $p['invoice'],
+      'tanggal' => date('d M Y · H:i', strtotime($p['created_at'])),
+      'status'  => $p['status'],
+      'total'   => (int) $p['total'],
+      'items'   => array_map(function($item) {
+        return ['gambar' => $item['gambar'], 'nama' => $item['nama']];
+      }, $p['items'])
+    ];
+  }, $pesananList), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+
+  const badgeMap = {
+    diproses:   { cls: 'badge-diproses',   label: 'Diproses'   },
+    dikirim:    { cls: 'badge-dikirim',    label: 'Dikirim'    },
+    selesai:    { cls: 'badge-selesai',    label: 'Selesai'    },
+    dibatalkan: { cls: 'badge-dibatalkan', label: 'Dibatalkan' }
+  };
+
+  function formatRp(n) { return 'Rp ' + Number(n).toLocaleString('id-ID'); }
+
+  function renderFoto(items) {
+    const max = 3;
+    let html = '';
+    items.slice(0, max).forEach(item => {
+      html += `<div class="foto-item"><img src="${item.gambar}" alt="${item.nama}" onerror="this.src='https://via.placeholder.com/72'"></div>`;
+    });
+    if (items.length > max) {
+      html += `<div class="foto-more">+${items.length - max}</div>`;
+    }
+    return html;
+  }
+
+  function renderPesanan(filter = 'semua') {
+    const list = document.getElementById('pesanan-list');
+    const data = filter === 'semua'
+      ? semuaPesanan
+      : semuaPesanan.filter(p => p.status === filter);
+
+    if (data.length === 0) {
+      list.innerHTML = `
+        <div class="empty">
+          <i class="fa-solid fa-receipt"></i>
+          <p>Belum ada pesanan${filter !== 'semua' ? ' dengan status ' + filter : ''}</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = data.map(p => {
+      const b = badgeMap[p.status] || badgeMap.diproses;
+      return `
+        <div class="pesanan-card">
+          <div class="card-header">
+            <div>
+              <div class="invoice">${p.invoice}</div>
+              <div class="tanggal">${p.tanggal}</div>
             </div>
-            <div class="order-box-body">
-              <div class="product-images-row">
-                <?php foreach($box['images'] as $imgUrl): ?>
-                  <div class="mini-img-wrapper">
-                    <img src="<?= $imgUrl ?>" alt="Item Thrift">
-                  </div>
-                <?php endforeach; ?>
-              </div>
-              <div class="price-summary">
-                <p><?= $box['jumlah_barang'] ?> Barang</p>
-                <h4>Total: <?= $box['total'] ?></h4>
-              </div>
-              <a href="/detail-pesanan?invoice=<?= $box['invoice'] ?>&status=<?= $box['status'] ?>" class="btn-detail-link">Lihat Detail</a>
+            <span class="badge ${b.cls}">${b.label}</span>
+          </div>
+          <div class="foto-row">${renderFoto(p.items)}</div>
+          <div class="card-footer">
+            <div>
+              <div class="jumlah">${p.items.length} Barang</div>
+              <div class="total">Total: ${formatRp(p.total)}</div>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <a href="detail_pesanan.php?invoice=${p.invoice}" class="btn-detail">Lihat Detail</a>
+              ${p.status === 'selesai' ? `<a href="tulis_review.php?id_pesanan=${p.id_pesanan}" class="btn-detail" style="background:#2a85ff; color:white; border-color:#2a85ff;">Beri Ulasan</a>` : ''}
             </div>
           </div>
-        <?php endforeach; ?>
+        </div>`;
+    }).join('');
+  }
 
-        <div class="empty-tab-state" id="empty-state">
-          <i class="fa-regular fa-folder-open" style="font-size: 36px; margin-bottom: 10px; display: block;"></i>
-          Belum ada riwayat pesanan di kategori ini.
-        </div>
+  function filterTab(el, status) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    renderPesanan(status);
+  }
 
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // FUNGSI JAVASCRIPT: FILTER DATA BERDASARKAN STATUS TAB YANG DIKLIK
-    function filterStatus(status, element) {
-        // Reset kelas active di semua tab button
-        document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
-        element.classList.add('active');
-
-        let adaItemVisible = false;
-        const listOrder = document.querySelectorAll('.order-box');
-
-        listOrder.forEach(box => {
-            const statusBox = box.getAttribute('data-status');
-            
-            if (status === 'all' || statusBox === status) {
-                box.style.display = 'flex';
-                adaItemVisible = true;
-            } else {
-                box.style.display = 'none';
-            }
-        });
-
-        // Tampilkan/sembunyikan pesan kosong jika tidak ada pesanan yang sesuai kategori
-        const emptyState = document.getElementById('empty-state');
-        if (adaItemVisible) {
-            emptyState.style.display = 'none';
-        } else {
-            emptyState.style.display = 'block';
-        }
-    }
-  </script>
+  renderPesanan('semua');
+</script>
 </body>
 </html>

@@ -3,7 +3,7 @@ session_start();
 require 'koneksi.php';
 
 if(isset($_SESSION['id_pengguna'])){
-    header("Location: dashboard.php");
+    header("Location: home.php");
     exit;
 }
 
@@ -35,9 +35,9 @@ $error = "";
                     if($user['role'] == "admin"){
                         header("Location: admin/dashboard.php");
                     } elseif($user['role'] == "penjual"){
-                        header("Location: seller/dashboard.php");
+                        header("Location: penjual/dashboard.php");
                     } else {
-                        header("Location: dashboard.php");
+                        header("Location: home.php");
                     }
                     exit;
 
@@ -58,6 +58,7 @@ $error = "";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LokalThrift – Login</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -559,15 +560,23 @@ $error = "";
 
             <div class="divider">atau masuk dengan</div>
 
-            <button class="btn-social">
-                <svg viewBox="0 0 48 48">
-                    <path fill="#4285F4" d="M46.5 24.5c0-1.5-.1-3-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2v6h7.7c4.5-4.1 7-10.2 7-17.2z" />
-                    <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.7-6c-2.2 1.5-4.9 2.3-8.2 2.3-6.3 0-11.6-4.2-13.5-9.9H2.6v6.2C6.6 42.8 14.7 48 24 48z" />
-                    <path fill="#FBBC04" d="M10.5 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6v-6.2H2.6C1 16.3 0 20 0 24s1 7.7 2.6 10.8l7.9-6.2z" />
-                    <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.5l6.8-6.8C35.9 2.1 30.4 0 24 0 14.7 0 6.6 5.2 2.6 13.2l7.9 6.2C12.4 13.7 17.7 9.5 24 9.5z" />
-                </svg>
-                Login dengan Google
-            </button>
+            <div id="g_id_onload"
+                 data-client_id="931774318654-l2msu750tkhh37hq7megcc99jqgeqqh9.apps.googleusercontent.com"
+                 data-context="signin"
+                 data-ux_mode="popup"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-shape="rectangular"
+                 data-theme="outline"
+                 data-text="signin_with"
+                 data-size="large"
+                 data-logo_alignment="left"
+                 style="display:flex; justify-content:center; width:100%; margin-bottom:12px;">
+            </div>
             <button class="btn-social">
                 <svg viewBox="0 0 48 48">
                     <circle cx="24" cy="24" r="24" fill="#1877F2" />
@@ -610,6 +619,26 @@ $error = "";
             document.getElementById('page').classList.add('page-leave-left');
             setTimeout(() => location.href = href, 400);
         });
+        
+        function handleCredentialResponse(response) {
+            fetch('api_google_login.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: response.credential })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    window.location.href = data.redirect;
+                } else {
+                    alert('Gagal Login: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Terjadi kesalahan jaringan.');
+            });
+        }
     </script>
         <?php if (isset($_SESSION['success'])) : ?>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

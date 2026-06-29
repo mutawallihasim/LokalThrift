@@ -4,136 +4,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Akun Saya<?php
-                  session_start();
-                  if (!isset($_SESSION['id_pengguna'])) {
-                    header('Location: login.php');
-                    exit;
-                  }
+  <title>Akun Saya
+  <?php
+  session_start();
+  if (!isset($_SESSION['id_pengguna'])) {
+    header('Location: login.php');
+    exit;
+  }
 
-                  require_once 'koneksi.php';
-                  $id_pengguna = (int)$_SESSION['id_pengguna'];
+  require_once 'koneksi.php';
+  $id_pengguna = (int)$_SESSION['id_pengguna'];
 
-                  // Handle POST request to update profile
-                  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profil'])) {
-                    $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
-                    $email = mysqli_real_escape_string($koneksi, $_POST['email']);
-                    $no_hp = mysqli_real_escape_string($koneksi, $_POST['no_hp']);
-                    $alamat = mysqli_real_escape_string($koneksi, $_POST['alamat']);
-                    $provinsi = mysqli_real_escape_string($koneksi, $_POST['provinsi'] ?? '');
-                    $kota = mysqli_real_escape_string($koneksi, $_POST['kota'] ?? '');
-                    $kecamatan = mysqli_real_escape_string($koneksi, $_POST['kecamatan'] ?? '');
-                    $kode_pos = mysqli_real_escape_string($koneksi, $_POST['kode_pos'] ?? '');
+  // Handle POST request to update profile
+  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profil'])) {
+    $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
+    $email = mysqli_real_escape_string($koneksi, $_POST['email']);
+    $no_hp = mysqli_real_escape_string($koneksi, $_POST['no_hp']);
+    $alamat = mysqli_real_escape_string($koneksi, $_POST['alamat']);
+    $provinsi = mysqli_real_escape_string($koneksi, $_POST['provinsi'] ?? '');
+    $kota = mysqli_real_escape_string($koneksi, $_POST['kota'] ?? '');
+    $kecamatan = mysqli_real_escape_string($koneksi, $_POST['kecamatan'] ?? '');
+    $kode_pos = mysqli_real_escape_string($koneksi, $_POST['kode_pos'] ?? '');
 
-                    $fotoQuery = "";
-                    if (isset($_FILES['foto_profil']) && $_FILES['foto_profil']['error'] === UPLOAD_ERR_OK) {
-                      $tmp_name = $_FILES['foto_profil']['tmp_name'];
-                      $name = $_FILES['foto_profil']['name'];
-                      $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-                      $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    $fotoQuery = "";
+    if (isset($_FILES['foto_profil']) && $_FILES['foto_profil']['error'] === UPLOAD_ERR_OK) {
+      $tmp_name = $_FILES['foto_profil']['tmp_name'];
+      $name = $_FILES['foto_profil']['name'];
+      $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+      $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
-                      if (in_array($ext, $allowed)) {
-                        $newFileName = $id_pengguna . '_' . time() . '.' . $ext;
-                        $destination = 'uploads/profil/' . $newFileName;
-                        if (move_uploaded_file($tmp_name, $destination)) {
-                          $fotoQuery = ", foto_profil='$destination'";
-                        }
-                      }
-                    }
+      if (in_array($ext, $allowed)) {
+        $newFileName = $id_pengguna . '_' . time() . '.' . $ext;
+        $destination = 'uploads/profil/' . $newFileName;
+        if (move_uploaded_file($tmp_name, $destination)) {
+          $fotoQuery = ", foto_profil='$destination'";
+        }
+      }
+    }
 
-                    mysqli_query($koneksi, "UPDATE pengguna SET nama='$nama', email='$email', no_hp='$no_hp', alamat='$alamat', provinsi='$provinsi', kota='$kota', kecamatan='$kecamatan', kode_pos='$kode_pos' $fotoQuery WHERE id_pengguna=$id_pengguna");
-                    header("Location: akun.php");
-                    exit;
-                  }
+    mysqli_query($koneksi, "UPDATE pengguna SET nama='$nama', email='$email', no_hp='$no_hp', alamat='$alamat', provinsi='$provinsi', kota='$kota', kecamatan='$kecamatan', kode_pos='$kode_pos' $fotoQuery WHERE id_pengguna=$id_pengguna");
+    header("Location: akun.php");
+    exit;
+  }
 
-                  // Handle POST request to update password
-                  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_password'])) {
-                    $old_pwd = $_POST['old_password'] ?? '';
-                    $new_pwd = $_POST['new_password'] ?? '';
-                    $conf_pwd = $_POST['confirm_password'] ?? '';
+  // Handle POST request to update password
+  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_password'])) {
+    $old_pwd = $_POST['old_password'] ?? '';
+    $new_pwd = $_POST['new_password'] ?? '';
+    $conf_pwd = $_POST['confirm_password'] ?? '';
 
-                    // Fetch user current data to verify old password
-                    $qUserCheck = mysqli_query($koneksi, "SELECT password FROM pengguna WHERE id_pengguna=$id_pengguna");
-                    $userCheck = mysqli_fetch_assoc($qUserCheck);
+    // Fetch user current data to verify old password
+    $qUserCheck = mysqli_query($koneksi, "SELECT password FROM pengguna WHERE id_pengguna=$id_pengguna");
+    $userCheck = mysqli_fetch_assoc($qUserCheck);
 
-                    if (!password_verify($old_pwd, $userCheck['password'])) {
-                      header("Location: akun.php?err=pwd_wrong");
-                      exit;
-                    }
+    if (!password_verify($old_pwd, $userCheck['password'])) {
+      header("Location: akun.php?err=pwd_wrong");
+      exit;
+    }
 
-                    if (strlen($new_pwd) < 8) {
-                      header("Location: akun.php?err=pwd_short");
-                      exit;
-                    }
+    if (strlen($new_pwd) < 8) {
+      header("Location: akun.php?err=pwd_short");
+      exit;
+    }
 
-                    if ($new_pwd !== $conf_pwd) {
-                      header("Location: akun.php?err=pwd_mismatch");
-                      exit;
-                    }
+    if ($new_pwd !== $conf_pwd) {
+      header("Location: akun.php?err=pwd_mismatch");
+      exit;
+    }
 
-                    $hashed = password_hash($new_pwd, PASSWORD_DEFAULT);
-                    mysqli_query($koneksi, "UPDATE pengguna SET password='$hashed' WHERE id_pengguna=$id_pengguna");
-                    header("Location: akun.php?msg=pwd_success");
-                    exit;
-                  }
+    $hashed = password_hash($new_pwd, PASSWORD_DEFAULT);
+    mysqli_query($koneksi, "UPDATE pengguna SET password='$hashed' WHERE id_pengguna=$id_pengguna");
+    header("Location: akun.php?msg=pwd_success");
+    exit;
+  }
 
-                  $qUser = mysqli_query($koneksi, "SELECT * FROM pengguna WHERE id_pengguna=$id_pengguna");
-                  $user = mysqli_fetch_assoc($qUser);
+  $qUser = mysqli_query($koneksi, "SELECT * FROM pengguna WHERE id_pengguna=$id_pengguna");
+  $user = mysqli_fetch_assoc($qUser);
 
-                  // Unread Notifications Count
-                  $qUnread = mysqli_query($koneksi, "SELECT COUNT(*) as unread FROM notifikasi WHERE id_pengguna=$id_pengguna AND is_read=0");
-                  $unreadCount = $qUnread ? (int)mysqli_fetch_assoc($qUnread)['unread'] : 0;
+  // Unread Notifications Count
+  $qUnread = mysqli_query($koneksi, "SELECT COUNT(*) as unread FROM notifikasi WHERE id_pengguna=$id_pengguna AND is_read=0");
+  $unreadCount = $qUnread ? (int)mysqli_fetch_assoc($qUnread)['unread'] : 0;
 
-                  $jmlFav = 0;
-                  $hasFavorit = mysqli_query($koneksi, "SHOW TABLES LIKE 'favorit'");
-                  if ($hasFavorit && mysqli_num_rows($hasFavorit) > 0) {
-                    $qF = mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM favorit WHERE id_pengguna=$id_pengguna");
-                    if ($qF) {
-                      $r = mysqli_fetch_assoc($qF);
-                      $jmlFav = (int)$r['cnt'];
-                    }
-                  }
+  $jmlFav = 0;
+  $hasFavorit = mysqli_query($koneksi, "SHOW TABLES LIKE 'favorit'");
+  if ($hasFavorit && mysqli_num_rows($hasFavorit) > 0) {
+    $qF = mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM favorit WHERE id_pengguna=$id_pengguna");
+    if ($qF) {
+      $r = mysqli_fetch_assoc($qF);
+      $jmlFav = (int)$r['cnt'];
+    }
+  }
 
-                  $jmlPesanan = 0;
-                  $hasPesanan = mysqli_query($koneksi, "SHOW TABLES LIKE 'pesanan'");
-                  if ($hasPesanan && mysqli_num_rows($hasPesanan) > 0) {
-                    $qP = mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM pesanan WHERE id_pengguna=$id_pengguna");
-                    if ($qP) {
-                      $rP = mysqli_fetch_assoc($qP);
-                      $jmlPesanan = (int)$rP['cnt'];
-                    }
-                  }
+  $jmlPesanan = 0;
+  $hasPesanan = mysqli_query($koneksi, "SHOW TABLES LIKE 'pesanan'");
+  if ($hasPesanan && mysqli_num_rows($hasPesanan) > 0) {
+    $qP = mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM pesanan WHERE id_pengguna=$id_pengguna");
+    if ($qP) {
+      $rP = mysqli_fetch_assoc($qP);
+      $jmlPesanan = (int)$rP['cnt'];
+    }
+  }
 
-                  $ratingValue = "0";
-                  $hasReview = mysqli_query($koneksi, "SHOW TABLES LIKE 'review'");
-                  if ($hasReview && mysqli_num_rows($hasReview) > 0) {
-                    if (isset($user['role']) && $user['role'] === 'penjual') {
-                      $qToko = mysqli_query($koneksi, "SELECT id_toko FROM toko WHERE id_penjual=$id_pengguna");
-                      if ($qToko && mysqli_num_rows($qToko) > 0) {
-                        $toko = mysqli_fetch_assoc($qToko);
-                        $idToko = (int)$toko['id_toko'];
-                        $qRating = mysqli_query(
-                          $koneksi,
-                          "SELECT AVG(r.rating) as avg_rating 
-                 FROM review r 
-                 JOIN produk p ON r.id_produk = p.id_produk 
-                 WHERE p.id_toko = $idToko"
-                        );
-                        if ($qRating) {
-                          $rRating = mysqli_fetch_assoc($qRating);
-                          $ratingValue = number_format((float)$rRating['avg_rating'], 1, ',', '.');
-                        }
-                      }
-                    } else {
-                      $qRating = mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM review WHERE id_pengguna=$id_pengguna");
-                      if ($qRating) {
-                        $rRating = mysqli_fetch_assoc($qRating);
-                        $ratingValue = (string)$rRating['cnt'];
-                      }
-                    }
-                  }
-                  ?>
-    <!DOCTYPE html>
+  $ratingValue = "0";
+  $hasReview = mysqli_query($koneksi, "SHOW TABLES LIKE 'review'");
+  if ($hasReview && mysqli_num_rows($hasReview) > 0) {
+    if (isset($user['role']) && $user['role'] === 'penjual') {
+      $qToko = mysqli_query($koneksi, "SELECT id_toko FROM toko WHERE id_penjual=$id_pengguna");
+      if ($qToko && mysqli_num_rows($qToko) > 0) {
+        $toko = mysqli_fetch_assoc($qToko);
+        $idToko = (int)$toko['id_toko'];
+        $qRating = mysqli_query(
+          $koneksi,
+          "SELECT AVG(r.rating) as avg_rating 
+FROM review r 
+JOIN produk p ON r.id_produk = p.id_produk 
+WHERE p.id_toko = $idToko"
+        );
+        if ($qRating) {
+          $rRating = mysqli_fetch_assoc($qRating);
+          $ratingValue = number_format((float)$rRating['avg_rating'], 1, ',', '.');
+        }
+      }
+    } else {
+      $qRating = mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM review WHERE id_pengguna=$id_pengguna");
+      if ($qRating) {
+        $rRating = mysqli_fetch_assoc($qRating);
+        $ratingValue = (string)$rRating['cnt'];
+      }
+    }
+  }
+  ?>
+<!DOCTYPE html>
     <html lang="id">
 
     <head>

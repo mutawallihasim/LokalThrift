@@ -27,12 +27,12 @@ if (isset($_POST['buat_toko'])) {
     } else {
         // Buat record toko
         $queryToko = mysqli_query($koneksi, "INSERT INTO toko (id_penjual, nama_toko, deskripsi, alamat) VALUES ('$id_pengguna', '$nama_toko', '$deskripsi', '$alamat')");
-        
+
         if ($queryToko) {
             // Update role pengguna menjadi penjual
             mysqli_query($koneksi, "UPDATE pengguna SET role='penjual' WHERE id_pengguna='$id_pengguna'");
             $_SESSION['role'] = 'penjual';
-            
+
             // Redirect ke dashboard penjual
             header("Location: penjual/dashboard.php");
             exit;
@@ -44,36 +44,139 @@ if (isset($_POST['buat_toko'])) {
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buka Toko - LokalThrift</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', Arial, sans-serif; }
-        body { background: #eef5fc; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .card { background: white; width: 100%; max-width: 400px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 30px 20px; }
-        .icon-top { font-size: 48px; color: #2a85ff; text-align: center; margin-bottom: 16px; }
-        .title { font-size: 20px; font-weight: bold; color: #0d1c2e; text-align: center; margin-bottom: 8px; }
-        .sub { font-size: 13px; color: #8fa3b8; text-align: center; margin-bottom: 24px; line-height: 1.5; }
-        .form-group { margin-bottom: 16px; }
-        .form-label { display: block; font-size: 13px; font-weight: bold; color: #0d1c2e; margin-bottom: 8px; }
-        .form-input { width: 100%; padding: 12px 14px; border: 1.5px solid #d4e3f3; border-radius: 10px; font-size: 14px; outline: none; transition: 0.2s; }
-        .form-input:focus { border-color: #2a85ff; }
-        textarea.form-input { resize: vertical; min-height: 80px; }
-        .btn-submit { width: 100%; background: #2a85ff; color: white; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
-        .btn-submit:hover { background: #1b6be0; }
-        .btn-back { display: block; text-align: center; font-size: 14px; color: #8fa3b8; margin-top: 16px; text-decoration: none; }
-        .alert { background: #fee2e2; color: #ef4444; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; text-align: center; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background: #eef5fc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 30px 20px;
+        }
+
+        .icon-top {
+            font-size: 48px;
+            color: #2a85ff;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0d1c2e;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .sub {
+            font-size: 13px;
+            color: #8fa3b8;
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #0d1c2e;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #d4e3f3;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #2a85ff;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: #2a85ff;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: #1b6be0;
+        }
+
+        .btn-back {
+            display: block;
+            text-align: center;
+            font-size: 14px;
+            color: #8fa3b8;
+            margin-top: 16px;
+            text-decoration: none;
+        }
+
+        .alert {
+            background: #fee2e2;
+            color: #ef4444;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
     </style>
 </head>
+
 <body>
     <div class="card">
         <div class="icon-top"><i class="fa-solid fa-store"></i></div>
         <div class="title">Buka Toko Thrift Anda</div>
         <div class="sub">Mulai hasilkan uang dengan menjual barang preloved terbaik Anda hari ini. Gratis dan mudah!</div>
 
-        <?php if($error !== ""): ?>
+        <?php if ($error !== ""): ?>
             <div class="alert"><?= $error ?></div>
         <?php endif; ?>
 
@@ -95,4 +198,5 @@ if (isset($_POST['buat_toko'])) {
         </form>
     </div>
 </body>
+
 </html>

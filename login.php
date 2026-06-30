@@ -506,7 +506,7 @@ $error = "";
         <div class="card card-slide-right">
 
             <div class="logo-area" style="gap:6px; margin-bottom:16px;">
-                <img src="Logo.svg" alt="LokalThrift" style="width:260px; height:88px; object-fit:contain;">
+                <img src="logo.svg" alt="LokalThrift" style="width:260px; height:88px; object-fit:contain;">
                 <h1 class="card-title" style="margin-top:2px;">Selamat Datang Kembali</h1>
                 <p class="card-sub" style="margin-bottom:0;">Masuk untuk melanjutkan perjalanan thrift-mu.</p>
             </div>

@@ -286,6 +286,8 @@ if ($qTerjual) while ($r = mysqli_fetch_assoc($qTerjual)) $produkTerjual[] = $r;
   .produk-grid    { grid-template-columns:repeat(2,1fr); }
 }
 </style>
+
+<!-- Tampilan -->
 </head><body>
 
 <div class="main-content">

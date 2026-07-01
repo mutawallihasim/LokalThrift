@@ -191,7 +191,7 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
 
     /* BANNER PROMO */
     .banner {
-      background: #bce3ff;
+      background: linear-gradient(115deg, #1c5fd6 0%, #2a85ff 45%, #57a6ff 100%);
       border-radius: 18px;
       padding: 0;
       margin-bottom: 25px;
@@ -201,11 +201,36 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       position: relative;
       overflow: hidden;
       min-height: 150px;
-      box-shadow: 0 8px 24px rgba(42, 133, 255, 0.18);
+      box-shadow: 0 10px 26px rgba(28, 95, 214, 0.32);
+    }
+
+    /* decorative soft circles instead of a clashing photo */
+    .banner::before {
+      content: "";
+      position: absolute;
+      top: -60px;
+      right: -40px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      z-index: 1;
+    }
+
+    .banner::after {
+      content: "";
+      position: absolute;
+      bottom: -70px;
+      right: 90px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.10);
+      z-index: 1;
     }
 
     .banner-text {
-      max-width: 58%;
+      max-width: 62%;
       position: relative;
       z-index: 4;
       padding: 26px 10px 26px 26px;
@@ -217,8 +242,8 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.6px;
-      color: #1a67d6;
-      background: rgba(255, 255, 255, 0.65);
+      color: #1c5fd6;
+      background: #ffffff;
       padding: 4px 10px;
       border-radius: 20px;
       margin-bottom: 8px;
@@ -228,91 +253,102 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       font-size: 21px;
       font-weight: 800;
       margin: 4px 0 6px;
-      color: #0b1f3a;
+      color: #ffffff;
       line-height: 1.25;
     }
 
     .banner-text p {
       font-size: 12.5px;
-      color: #375170;
+      color: rgba(255, 255, 255, 0.88);
       margin-bottom: 14px;
     }
 
     .banner-text .btn-belanja {
       display: inline-block;
       padding: 9px 20px;
-      background: #2a85ff;
-      color: white;
+      background: #ffffff;
+      color: #1c5fd6;
       font-size: 12.5px;
       font-weight: bold;
       border-radius: 25px;
       text-decoration: none;
-      box-shadow: 0 6px 14px rgba(42, 133, 255, 0.45);
+      box-shadow: 0 6px 14px rgba(11, 31, 58, 0.25);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
     .banner-text .btn-belanja:hover {
       transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(42, 133, 255, 0.55);
+      box-shadow: 0 8px 18px rgba(11, 31, 58, 0.32);
     }
 
-    /* image bleeds edge-to-edge like real e-commerce banners */
-    .banner-img-container {
+    /* photo card area replacing the old flat SVG icon */
+    .banner-icon-container {
       position: absolute;
       top: 0;
       right: 0;
       bottom: 0;
-      width: 52%;
+      width: 40%;
       height: 100%;
-      overflow: hidden;
-      z-index: 1;
-    }
-
-    .banner-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      display: block;
-    }
-
-    /* color-wash tint so the photo's tones (even dark ones) harmonize with the
-       brand blue instead of feeling like a separate, disconnected image */
-    .banner-img-container .tint {
-      position: absolute;
-      inset: 0;
-      background: rgba(74, 150, 230, 0.38);
-      mix-blend-mode: color;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       z-index: 2;
     }
 
-    /* gradient overlay that fades the banner background color into the photo,
-       so the transition from text area to image looks seamless */
-    .banner-img-container::before {
+    /* the thrift-clothing photo sits inside a tilted, rounded, bordered card
+       so it reads as a deliberate product highlight instead of a clashing
+       full-bleed background — this is what keeps it feeling cohesive */
+    .banner-photo-card {
+      width: 62%;
+      aspect-ratio: 1 / 1;
+      border-radius: 16px;
+      overflow: hidden;
+      transform: rotate(-4deg);
+      border: 4px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 14px 28px rgba(11, 31, 58, 0.35);
+      position: relative;
+    }
+
+    .banner-photo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+      display: block;
+      /* gentle color match so the photo's natural tones sit comfortably
+         inside the blue banner instead of feeling like a separate cutout */
+      filter: saturate(1.05) brightness(1.03);
+    }
+
+    /* soft blue wash along the card edges to tie it visually into the
+       gradient background, without flattening the photo itself */
+    .banner-photo-card::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-        to right,
-        #bce3ff 0%,
-        rgba(188, 227, 255, 0.95) 10%,
-        rgba(188, 227, 255, 0.6) 26%,
-        rgba(188, 227, 255, 0) 50%
-      );
+      background: linear-gradient(160deg, rgba(28, 95, 214, 0.22) 0%, rgba(28, 95, 214, 0) 45%, rgba(11, 31, 58, 0.18) 100%);
+      pointer-events: none;
+    }
+
+    .banner-badge {
+      position: absolute;
+      top: 14%;
+      right: 10%;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ffe066;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 14px rgba(11, 31, 58, 0.3);
       z-index: 3;
     }
 
-    /* soft light vignette on the far right so the photo edge doesn't cut off harshly */
-    .banner-img-container::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to left,
-        rgba(11, 31, 58, 0.18) 0%,
-        rgba(11, 31, 58, 0) 18%
-      );
-      z-index: 3;
+    .banner-badge span {
+      font-size: 17px;
+      font-weight: 800;
+      color: #1c5fd6;
     }
 
     /* SECTION LAYOUT PRODUK UTAMA */
@@ -563,8 +599,21 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
         font-size: 16px;
       }
 
-      .banner-img-container {
-        width: 50%;
+      .banner-icon-container {
+        width: 38%;
+      }
+
+      .banner-photo-card {
+        width: 68%;
+      }
+
+      .banner-badge {
+        width: 52px;
+        height: 52px;
+      }
+
+      .banner-badge span {
+        font-size: 21px;
       }
 
       /* DI LAPTOP: Blok produk terbaru dan rekomendasi ditaruh BERDAMPINGAN KIRI-KANAN */
@@ -662,9 +711,13 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       <p>Diskon hingga 50% + Gratis Ongkir</p>
       <a href="#" class="btn-belanja">Belanja Sekarang</a>
     </div>
-    <div class="banner-img-container">
-      <img class="banner-img" src="https://images.unsplash.com/photo-1772570824145-e996a55204fb?w=1200&q=80&auto=format&fit=crop" alt="Promo">
-      <div class="tint"></div>
+    <div class="banner-icon-container">
+      <div class="banner-photo-card">
+        <img src="https://images.unsplash.com/photo-1637228393246-c38a4b3d2011?w=500&q=80&auto=format&fit=crop" alt="Pakaian thrift">
+      </div>
+      <div class="banner-badge">
+        <span>%</span>
+      </div>
     </div>
   </div>
 

@@ -189,7 +189,7 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
     /* BANNER PROMO */
     .banner {
       background: #bce3ff;
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 0;
       margin-bottom: 25px;
       display: flex;
@@ -198,45 +198,59 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       position: relative;
       overflow: hidden;
       min-height: 150px;
+      box-shadow: 0 8px 24px rgba(42, 133, 255, 0.18);
     }
 
     .banner-text {
       max-width: 58%;
       position: relative;
-      z-index: 3;
-      padding: 24px 10px 24px 24px;
+      z-index: 4;
+      padding: 26px 10px 26px 26px;
     }
 
     .banner-text .tag {
+      display: inline-block;
       font-size: 11px;
-      font-weight: bold;
+      font-weight: 700;
       text-transform: uppercase;
-      color: #333;
+      letter-spacing: 0.6px;
+      color: #1a67d6;
+      background: rgba(255, 255, 255, 0.65);
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
     }
 
     .banner-text h1 {
-      font-size: 20px;
+      font-size: 21px;
       font-weight: 800;
-      margin: 4px 0;
-      color: #000;
-      line-height: 1.2;
+      margin: 4px 0 6px;
+      color: #0b1f3a;
+      line-height: 1.25;
     }
 
     .banner-text p {
-      font-size: 12px;
-      color: #444;
-      margin-bottom: 10px;
+      font-size: 12.5px;
+      color: #375170;
+      margin-bottom: 14px;
     }
 
     .banner-text .btn-belanja {
       display: inline-block;
-      padding: 8px 16px;
+      padding: 9px 20px;
       background: #2a85ff;
       color: white;
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: bold;
       border-radius: 25px;
       text-decoration: none;
+      box-shadow: 0 6px 14px rgba(42, 133, 255, 0.45);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .banner-text .btn-belanja:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(42, 133, 255, 0.55);
     }
 
     /* image bleeds edge-to-edge like real e-commerce banners */
@@ -259,6 +273,16 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       display: block;
     }
 
+    /* color-wash tint so the photo's tones (even dark ones) harmonize with the
+       brand blue instead of feeling like a separate, disconnected image */
+    .banner-img-container .tint {
+      position: absolute;
+      inset: 0;
+      background: rgba(74, 150, 230, 0.38);
+      mix-blend-mode: color;
+      z-index: 2;
+    }
+
     /* gradient overlay that fades the banner background color into the photo,
        so the transition from text area to image looks seamless */
     .banner-img-container::before {
@@ -268,24 +292,24 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       background: linear-gradient(
         to right,
         #bce3ff 0%,
-        rgba(188, 227, 255, 0.95) 8%,
-        rgba(188, 227, 255, 0.55) 22%,
-        rgba(188, 227, 255, 0) 45%
+        rgba(188, 227, 255, 0.95) 10%,
+        rgba(188, 227, 255, 0.6) 26%,
+        rgba(188, 227, 255, 0) 50%
       );
-      z-index: 2;
+      z-index: 3;
     }
 
-    /* subtle darkening on the right edge so the photo doesn't look flat/cropped */
+    /* soft light vignette on the far right so the photo edge doesn't cut off harshly */
     .banner-img-container::after {
       content: "";
       position: absolute;
       inset: 0;
       background: linear-gradient(
         to left,
-        rgba(0, 0, 0, 0.12) 0%,
-        rgba(0, 0, 0, 0) 20%
+        rgba(11, 31, 58, 0.18) 0%,
+        rgba(11, 31, 58, 0) 18%
       );
-      z-index: 2;
+      z-index: 3;
     }
 
     /* SECTION LAYOUT PRODUK UTAMA */
@@ -637,6 +661,7 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
     </div>
     <div class="banner-img-container">
       <img class="banner-img" src="https://images.unsplash.com/photo-1772570824145-e996a55204fb?w=1200&q=80&auto=format&fit=crop" alt="Promo">
+      <div class="tint"></div>
     </div>
   </div>
 

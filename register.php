@@ -52,8 +52,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (mysqli_stmt_execute($stmt_insert)) {
                 mysqli_stmt_close($stmt_insert);
-                $_SESSION['success'] = "Registrasi berhasil. Silakan login.";
-                header("Location: login.php");
+
+                // Langsung login-kan pengguna, tidak perlu login manual lagi
+                $id_pengguna_baru = mysqli_insert_id($koneksi);
+                $_SESSION['id_pengguna'] = $id_pengguna_baru;
+                $_SESSION['nama']        = $nama;
+                $_SESSION['role']        = 'pembeli';
+
+                $_SESSION['success'] = "Registrasi berhasil. Selamat datang, $nama!";
+                header("Location: home.php");
                 exit;
             } else {
                 $error = 'Gagal mendaftar: ' . mysqli_error($koneksi);

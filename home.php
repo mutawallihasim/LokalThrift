@@ -734,4 +734,16 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
     }
   }
 </script>
+<?php if (isset($_SESSION['success'])) : ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Berhasil',
+    text: '<?= addslashes($_SESSION['success']); ?>',
+    confirmButtonText: 'OK'
+});
+</script>
+<?php unset($_SESSION['success']); ?>
+<?php endif; ?>
 </html>

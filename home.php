@@ -190,17 +190,21 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
     .banner {
       background: #bce3ff;
       border-radius: 16px;
-      padding: 20px;
+      padding: 0;
       margin-bottom: 25px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: relative;
       overflow: hidden;
+      min-height: 150px;
     }
 
     .banner-text {
-      max-width: 65%;
+      max-width: 58%;
+      position: relative;
+      z-index: 3;
+      padding: 24px 10px 24px 24px;
     }
 
     .banner-text .tag {
@@ -235,18 +239,53 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       text-decoration: none;
     }
 
+    /* image bleeds edge-to-edge like real e-commerce banners */
     .banner-img-container {
-      position: relative;
-      width: 35%;
-      height: 100px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 52%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
     }
 
     .banner-img {
-      max-height: 100px;
-      object-fit: contain;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    /* gradient overlay that fades the banner background color into the photo,
+       so the transition from text area to image looks seamless */
+    .banner-img-container::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to right,
+        #bce3ff 0%,
+        rgba(188, 227, 255, 0.95) 8%,
+        rgba(188, 227, 255, 0.55) 22%,
+        rgba(188, 227, 255, 0) 45%
+      );
+      z-index: 2;
+    }
+
+    /* subtle darkening on the right edge so the photo doesn't look flat/cropped */
+    .banner-img-container::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to left,
+        rgba(0, 0, 0, 0.12) 0%,
+        rgba(0, 0, 0, 0) 20%
+      );
+      z-index: 2;
     }
 
     /* SECTION LAYOUT PRODUK UTAMA */
@@ -481,8 +520,12 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       }
 
       .banner {
-        padding: 30px 50px;
         border-radius: 20px;
+        min-height: 220px;
+      }
+
+      .banner-text {
+        padding: 40px 10px 40px 50px;
       }
 
       .banner-text h1 {
@@ -494,11 +537,7 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       }
 
       .banner-img-container {
-        height: 140px;
-      }
-
-      .banner-img {
-        max-height: 150px;
+        width: 50%;
       }
 
       /* DI LAPTOP: Blok produk terbaru dan rekomendasi ditaruh BERDAMPINGAN KIRI-KANAN */
@@ -597,7 +636,7 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       <a href="#" class="btn-belanja">Belanja Sekarang</a>
     </div>
     <div class="banner-img-container">
-      <img class="banner-img" src="https://images.unsplash.com/photo-1540221652346-e5dd6b50f3e7?w=300" alt="Promo">
+      <img class="banner-img" src="https://images.unsplash.com/photo-1772570824145-e996a55204fb?w=1200&q=80&auto=format&fit=crop" alt="Promo">
     </div>
   </div>
 

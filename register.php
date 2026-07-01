@@ -75,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LokalThrift – Daftar</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -283,6 +284,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: var(--primary-hover); 
             transform: translateY(-1px); 
             box-shadow: 0 8px 24px rgba(37,99,235,0.35); 
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 18px 0;
+            color: var(--text-light);
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .google-btn-wrap {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 4px;
         }
 
         .switch-link { 
@@ -570,6 +595,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit" class="btn-primary">Daftar</button>
         </form>
 
+        <div class="divider">atau daftar dengan</div>
+
+        <div id="g_id_onload"
+             data-client_id="931774318654-l2msu750tkhh37hq7megcc99jqgeqqh9.apps.googleusercontent.com"
+             data-context="signup"
+             data-ux_mode="popup"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+
+        <div class="google-btn-wrap">
+            <div id="googleBtn"></div>
+        </div>
+
         <div class="switch-link">
             Sudah punya akun? <a href="login.php" id="toLogin">Login di sini</a>
         </div>
@@ -647,6 +686,43 @@ document.getElementById('toLogin').addEventListener('click', function(e) {
     document.getElementById('page').classList.add('page-leave-left');
     setTimeout(() => location.href = href, 400);
 });
+
+window.addEventListener('load', function() {
+    if (window.google && google.accounts && google.accounts.id) {
+        const wrap = document.querySelector('.google-btn-wrap');
+        google.accounts.id.renderButton(
+            document.getElementById('googleBtn'),
+            {
+                theme: 'outline',
+                size: 'large',
+                shape: 'rectangular',
+                text: 'signup_with',
+                logo_alignment: 'left',
+                width: wrap.offsetWidth
+            }
+        );
+    }
+});
+
+function handleCredentialResponse(response) {
+    fetch('api_google_login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            window.location.href = data.redirect;
+        } else {
+            alert('Gagal Daftar: ' + data.message);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Terjadi kesalahan jaringan.');
+    });
+}
 </script>
 </body>
 </html>

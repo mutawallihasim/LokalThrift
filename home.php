@@ -174,18 +174,25 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
 
     .kategori .item {
       padding: 10px 24px;
-      background: #a9d4f9;
-      color: #000;
+      background: #eaf3fe;
+      color: #1c5fd6;
+      border: 1px solid #d3e6fc;
       border-radius: 30px;
       font-size: 14px;
       font-weight: bold;
       white-space: nowrap;
       cursor: pointer;
       text-decoration: none;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .kategori .item:hover {
+      background: #d9ebfe;
     }
 
     .kategori .item.item-active {
-      background: #2a85ff;
+      background: linear-gradient(115deg, #1c5fd6 0%, #2a85ff 100%);
+      border-color: transparent;
       color: #fff;
     }
 

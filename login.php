@@ -338,6 +338,13 @@ $error = "";
             background: var(--border);
         }
 
+        .google-btn-wrap {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
         .btn-social {
             width: 100%;
             height: 46px;
@@ -568,22 +575,9 @@ $error = "";
                  data-auto_prompt="false">
             </div>
             
-            <div class="g_id_signin"
-                 data-type="standard"
-                 data-shape="rectangular"
-                 data-theme="outline"
-                 data-text="signin_with"
-                 data-size="large"
-                 data-logo_alignment="left"
-                 style="display:flex; justify-content:center; width:100%; margin-bottom:12px;">
+            <div class="google-btn-wrap">
+                <div id="googleBtn"></div>
             </div>
-            <button class="btn-social">
-                <svg viewBox="0 0 48 48">
-                    <circle cx="24" cy="24" r="24" fill="#1877F2" />
-                    <path fill="#fff" d="M33 24h-6v18h-6V24h-4v-6h4v-3.5C21 11.4 22.9 9 28 9h5v6h-3c-1.1 0-2 .9-2 2v1h5l-1 6z" />
-                </svg>
-                Login dengan Facebook
-            </button>
 
             <div class="switch-link">
                 Belum punya akun? <a href="register.php" id="toRegister">Daftar di sini</a>
@@ -620,6 +614,23 @@ $error = "";
             setTimeout(() => location.href = href, 400);
         });
         
+        window.addEventListener('load', function() {
+            if (window.google && google.accounts && google.accounts.id) {
+                const wrap = document.querySelector('.google-btn-wrap');
+                google.accounts.id.renderButton(
+                    document.getElementById('googleBtn'),
+                    {
+                        theme: 'outline',
+                        size: 'large',
+                        shape: 'rectangular',
+                        text: 'signin_with',
+                        logo_alignment: 'left',
+                        width: wrap.offsetWidth
+                    }
+                );
+            }
+        });
+
         function handleCredentialResponse(response) {
             fetch('api_google_login.php', {
                 method: 'POST',

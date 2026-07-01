@@ -330,27 +330,6 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       pointer-events: none;
     }
 
-    .banner-badge {
-      position: absolute;
-      top: 14%;
-      right: 10%;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #ffe066;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 6px 14px rgba(11, 31, 58, 0.3);
-      z-index: 3;
-    }
-
-    .banner-badge span {
-      font-size: 17px;
-      font-weight: 800;
-      color: #1c5fd6;
-    }
-
     /* SECTION LAYOUT PRODUK UTAMA */
     .section-container {
       display: flex;
@@ -607,15 +586,6 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
         width: 68%;
       }
 
-      .banner-badge {
-        width: 52px;
-        height: 52px;
-      }
-
-      .banner-badge span {
-        font-size: 21px;
-      }
-
       /* DI LAPTOP: Blok produk terbaru dan rekomendasi ditaruh BERDAMPINGAN KIRI-KANAN */
       .section-container {
         flex-direction: row;
@@ -714,9 +684,6 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
     <div class="banner-icon-container">
       <div class="banner-photo-card">
         <img src="https://images.unsplash.com/photo-1637228393246-c38a4b3d2011?w=500&q=80&auto=format&fit=crop" alt="Pakaian thrift">
-      </div>
-      <div class="banner-badge">
-        <span>%</span>
       </div>
     </div>
   </div>

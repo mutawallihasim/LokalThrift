@@ -249,21 +249,6 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       object-fit: contain;
     }
 
-    .badge-sale {
-      position: absolute;
-      right: 0px;
-      bottom: -5px;
-      background: #fff000;
-      color: #000;
-      font-size: 10px;
-      font-weight: 900;
-      padding: 6px;
-      border-radius: 50%;
-      transform: rotate(-15deg);
-      border: 1px dashed #000;
-      text-align: center;
-    }
-
     /* SECTION LAYOUT PRODUK UTAMA */
     .section-container {
       display: flex;
@@ -613,7 +598,6 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
     </div>
     <div class="banner-img-container">
       <img class="banner-img" src="https://images.unsplash.com/photo-1540221652346-e5dd6b50f3e7?w=300" alt="Promo">
-      <div class="badge-sale">sale<br>50%<br>off</div>
     </div>
   </div>
 

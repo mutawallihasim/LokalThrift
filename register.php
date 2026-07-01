@@ -509,7 +509,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="logo-area" style="gap: 6px; margin-bottom: 16px;">
             <img src="logo.svg" alt="LokalThrift" style="width: 260px; height: 88px; object-fit: contain;">
             <h1 class="card-title" style="margin-top: 2px;">Buat Akun Baru</h1>
-            <p class="card-sub" style="margin-bottom: 0;">Gabung dan temukan thrift item terbaik<br>di sekitarmu.</p>
+            <p class="card-sub" style="margin-bottom: 0;">Gabung dan temukan thrift item terbaik </p>
         </div>
 
         <?php if ($error): ?>

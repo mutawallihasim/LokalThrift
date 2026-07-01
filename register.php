@@ -14,13 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama     = trim($_POST['nama'] ?? '');
     $email    = trim($_POST['email'] ?? '');
     $no_hp    = trim($_POST['no_hp'] ?? '');
-    $alamat   = trim($_POST['alamat'] ?? '');
+    $alamat   = ''; // Field alamat dihapus dari form, disimpan kosong
     $password = $_POST['password'] ?? '';
     $confirm  = $_POST['confirm_password'] ?? '';
     $agree    = $_POST['agree'] ?? '';
 
     // Validasi Input
-    if (!$nama || !$email || !$no_hp || !$alamat || !$password || !$confirm) {
+    if (!$nama || !$email || !$no_hp || !$password || !$confirm) {
         $error = 'Semua field harus diisi.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Format email tidak valid.';
@@ -509,7 +509,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="logo-area" style="gap: 6px; margin-bottom: 16px;">
             <img src="logo.svg" alt="LokalThrift" style="width: 260px; height: 88px; object-fit: contain;">
             <h1 class="card-title" style="margin-top: 2px;">Buat Akun Baru</h1>
-            <p class="card-sub" style="margin-bottom: 0;">Gabung dan temukan thrift item terbaik </p>
+            <p class="card-sub" style="margin-bottom: 0;">Gabung dan temukan thrift item terbaik<br>di sekitarmu.</p>
         </div>
 
         <?php if ($error): ?>
@@ -543,11 +543,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 2.08 4.18 2 2 0 0 1 4.08 2h3a2 2 0 0 1 2 1.72c.13 1 .37 1.97.71 2.9a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.18-1.18a2 2 0 0 1 2.11-.45c.93.34 1.9.58 2.9.71A2 2 0 0 1 22 16.92z"/></svg>
                     <input type="text" name="no_hp" placeholder="08xxxxxxxxxx" value="<?= htmlspecialchars($_POST['no_hp'] ?? '') ?>">
                 </div>
-            </div>
-
-            <div class="field">
-                <label>Alamat</label>
-                <textarea class="form-textarea" name="alamat" placeholder="masukkan alamat lengkap"><?= htmlspecialchars($_POST['alamat'] ?? '') ?></textarea>
             </div>
 
             <div class="field" id="pwField">

@@ -14,43 +14,126 @@ $activeTokoId = isset($_GET['toko_id']) ? (int)$_GET['toko_id'] : 0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat - LokalThrift</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
         }
 
         body {
             background: #eef5fc;
             height: 100vh;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* Navbar (simple) */
-        .top-nav {
+        /* BOTTOM NAVBAR (sama seperti halaman lain) */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
             background: white;
-            padding: 15px 24px;
-            border-bottom: 1px solid #e0ecf8;
             display: flex;
+            justify-content: space-around;
             align-items: center;
-            gap: 20px;
+            padding: 10px 0 14px 0;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+            z-index: 999;
         }
 
-        .top-nav a {
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            color: #777;
             text-decoration: none;
-            color: #2a85ff;
-            font-weight: 700;
-            font-size: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            flex: 1;
+            gap: 4px;
         }
 
-        .top-nav a:hover {
-            opacity: 0.8;
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 0;
+            display: block;
+        }
+
+        .nav-item.active { color: #2a85ff; }
+        .nav-item.nav-logout { color: #e53935; }
+        .nav-item.nav-logout:hover { color: #c62828; }
+
+        .sidebar-logo { display: none; }
+
+        @media (min-width: 769px) {
+            body { flex-direction: row; }
+
+            .navbar {
+                position: fixed;
+                top: 0; left: 0; bottom: 0; right: auto;
+                width: 160px; height: 100vh;
+                flex-direction: column; justify-content: flex-start; align-items: stretch;
+                padding: 20px 0 20px 0;
+                border-top-left-radius: 0; border-top-right-radius: 0;
+                border-right: 1px solid #e0ecf8; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+                gap: 4px;
+            }
+
+            .sidebar-logo {
+                display: flex; align-items: center; justify-content: center; gap: 6px;
+                font-size: 13px; font-weight: 800; color: #2a85ff;
+                padding: 0 8px 18px 8px; border-bottom: 1px solid #e0ecf8;
+                margin-bottom: 8px; text-align: center;
+            }
+
+            .nav-item {
+                display: flex; flex-direction: column; align-items: center; justify-content: center;
+                text-align: center; padding: 12px 8px; border-radius: 12px; margin: 2px 8px;
+                font-size: 11px; font-weight: 600; flex: none;
+                gap: 5px; transition: background 0.2s, color 0.2s;
+            }
+
+            .nav-item:hover { background: #eef5fc; color: #2a85ff; }
+            .nav-item.active { background: #ddeeff; color: #2a85ff; }
+            .nav-item.nav-logout { margin-top: auto; color: #e53935; }
+            .nav-item.nav-logout:hover { background: #fff0f0; color: #c62828; }
+
+            .nav-item i { font-size: 22px; display: block; margin-bottom: 0; width: auto; }
+
+            .page-wrapper { margin-left: 160px; padding-bottom: 0 !important; }
+        }
+
+        /* WRAPPER konten di samping/atas navbar */
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding-bottom: 78px; /* ruang untuk bottom navbar mobile */
+        }
+
+        .chat-topbar {
+            padding: 16px 24px;
+            background: white;
+            border-bottom: 1px solid #e0ecf8;
+        }
+
+        .chat-topbar .page-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #0d1c2e;
         }
 
         /* Layout */
@@ -298,28 +381,61 @@ $activeTokoId = isset($_GET['toko_id']) ? (int)$_GET['toko_id'] : 0;
 
 <body>
 
-    <div class="top-nav">
-        <a href="home.php"><i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda</a>
-        <span style="font-weight:700; color:#0d1c2e; margin-left:20px; font-size:18px;">Pesan Anda</span>
+    <div class="navbar">
+        <div class="sidebar-logo">
+            <img src="Logo.svg" alt="LokalThrift" style="width:140px; height:auto; display:block; margin:0 auto;">
+        </div>
+        <a href="home.php" class="nav-item">
+            <i class="fa-solid fa-house"></i><span>Beranda</span>
+        </a>
+        <a href="keranjang.php" class="nav-item">
+            <i class="fa-solid fa-cart-shopping"></i><span>Keranjang</span>
+        </a>
+        <a href="pesanan.php" class="nav-item">
+            <i class="fa-solid fa-bag-shopping"></i><span>Pesanan</span>
+        </a>
+        <a href="cek_toko.php" class="nav-item">
+            <i class="fa-solid fa-shop"></i><span>Toko</span>
+        </a>
+        <a href="akun.php" class="nav-item">
+            <i class="fa-solid fa-user"></i><span>Akun</span>
+        </a>
+        <a href="chat.php" class="nav-item active">
+            <i class="fa-solid fa-message"></i><span>Chat</span>
+        </a>
+        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+            <a href="admin/dashboard.php" class="nav-item">
+                <i class="fa-solid fa-chart-pie"></i><span>Admin</span>
+            </a>
+        <?php endif; ?>
+        <a href="logout.php" class="nav-item nav-logout">
+            <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+        </a>
     </div>
 
-    <div class="chat-container">
-        <!-- Sidebar -->
-        <div class="chat-sidebar">
-            <div class="sidebar-header">Kontak Chat</div>
-            <div class="contact-list" id="contact-list">
-                <!-- AJAX Loaded -->
-            </div>
+    <div class="page-wrapper">
+        <div class="chat-topbar">
+            <div class="page-title">Pesan Anda</div>
         </div>
 
-        <!-- Main -->
-        <div class="chat-main" id="chat-main">
-            <div class="empty-chat">
-                <i class="fa-regular fa-comments"></i>
-                <h3>Pilih chat untuk mulai membalas</h3>
+        <div class="chat-container">
+            <!-- Sidebar -->
+            <div class="chat-sidebar">
+                <div class="sidebar-header">Kontak Chat</div>
+                <div class="contact-list" id="contact-list">
+                    <!-- AJAX Loaded -->
+                </div>
+            </div>
+
+            <!-- Main -->
+            <div class="chat-main" id="chat-main">
+                <div class="empty-chat">
+                    <i class="fa-regular fa-comments"></i>
+                    <h3>Pilih chat untuk mulai membalas</h3>
+                </div>
             </div>
         </div>
-    </div>
+    </div><!-- /.page-wrapper -->
 
     <script>
         let activePartnerId = <?= $activeTokoId ?>;

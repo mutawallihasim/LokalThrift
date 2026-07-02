@@ -96,27 +96,12 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($produk['nama']) ?> - LokalThrift</title>
-  <!-- DEBUG INFO -->
-  <style>
-  .debug-info {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background: rgba(0,0,0,0.85);
-    color: white;
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 11px;
-    z-index: 99999;
-    max-width: 250px;
-    font-family: monospace;
-    line-height: 1.5;
-  }
-  .debug-info strong { color: #4ade80; }
-  </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', Arial, sans-serif; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif; }
 
     body {
       background: #eef5fc;
@@ -611,7 +596,7 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
     <div class="info-section">
       <div>
         <h1 class="product-title" id="product-title">Nama Produk</h1>
-        <div style="font-size:14px; color:#64748b; margin-top:5px; font-weight:600; display:flex; align-items:center; gap:8px;">
+        <div style="font-size:14px; color:#8fa3b8; margin-top:5px; font-weight:600; display:flex; align-items:center; gap:8px;">
           <?php if (!empty($produk['foto_toko'])): ?>
             <img src="<?= htmlspecialchars($produk['foto_toko']) ?>" style="width:24px; height:24px; border-radius:50%; object-fit:cover;">
           <?php else: ?>
@@ -643,7 +628,7 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       <!-- UKURAN -->
       <div>
         <div class="section-label">Ukuran</div>
-        <span class="kondisi-badge" id="product-size" style="background:#f1f5f9; color:#0d1c2e; border:1px solid #e2e8f0; font-weight:700; padding:6px 14px; display:inline-block; border-radius:8px;">
+        <span class="kondisi-badge" id="product-size" style="background:#eef5fc; color:#0d1c2e; border:1px solid #d4e3f3; font-weight:700; padding:6px 14px; display:inline-block; border-radius:8px;">
           <?= htmlspecialchars($produk['ukuran'] ?? 'All Size') ?>
         </span>
       </div>
@@ -671,14 +656,14 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       <div class="divider"></div>
       <div>
         <div class="section-label">Ulasan Pembeli</div>
-        <div style="background:#f8fafc; border-radius:12px; padding:16px; margin-top:10px;">
+        <div style="background:#eef5fc; border-radius:12px; padding:16px; margin-top:10px;">
           <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
             <div style="font-weight:700; font-size:14px;"><?= htmlspecialchars($ulasanProduk['nama_lengkap'] ?? 'Pembeli') ?></div>
             <div style="color:#fbbf24; font-size:13px;">
               <?php for($i=0; $i<$ulasanProduk['rating']; $i++) echo '<i class="fa-solid fa-star"></i>'; ?>
             </div>
           </div>
-          <div style="font-size:13px; color:#475569; line-height:1.5;">
+          <div style="font-size:13px; color:#556980; line-height:1.5;">
             <?= nl2br(htmlspecialchars($ulasanProduk['ulasan'] ?? '')) ?>
           </div>
           <div style="font-size:11px; color:#94a3b8; margin-top:10px;">
@@ -701,7 +686,7 @@ function rupiah($n) { return 'Rp ' . number_format($n, 0, ',', '.'); }
       Beli Sekarang
     </button>
     <?php else: ?>
-    <button class="btn-action" style="background:#e2e8f0; color:#64748b; cursor:not-allowed;" disabled>
+    <button class="btn-action" style="background:#e0ecf8; color:#8fa3b8; cursor:not-allowed;" disabled>
       Produk Habis/Terjual
     </button>
     <?php endif; ?>

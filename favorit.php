@@ -34,18 +34,20 @@ if ($qF) {
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Favorit Saya - LokalThrift</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2 family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
     }
 
     body {
-      background-color: #f4f8fc;
+      background-color: #eef5fc;
       color: #0d1c2e;
       min-height: 100vh;
       display: flex;
@@ -227,7 +229,7 @@ if ($qF) {
     }
 
     .page-title i {
-      color: #e53e3e;
+      color: #e53935;
     }
 
     .products-grid {
@@ -244,14 +246,14 @@ if ($qF) {
       flex-direction: column;
       text-decoration: none;
       color: inherit;
-      border: 1px solid #eef2f7;
+      border: 1px solid #e0ecf8;
       position: relative;
     }
 
     .product-img-wrapper {
       width: 100%;
       aspect-ratio: 1 / 1;
-      background: #f8fbfe;
+      background: #f0f6fc;
       overflow: hidden;
       position: relative;
     }
@@ -274,7 +276,7 @@ if ($qF) {
       display: flex;
       justify-content: center;
       align-items: center;
-      color: #e53e3e;
+      color: #e53935;
       cursor: pointer;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
@@ -301,15 +303,15 @@ if ($qF) {
       padding: 60px 20px;
       background: white;
       border-radius: 16px;
-      border: 1px solid #eef2f7;
-      color: #7d8c9e;
+      border: 1px solid #e0ecf8;
+      color: #8fa3b8;
       width: 100%;
       grid-column: 1 / -1;
     }
 
     .empty-state i {
       font-size: 48px;
-      color: #ccd6e0;
+      color: #c8dff5;
       margin-bottom: 15px;
     }
   </style>
@@ -335,6 +337,9 @@ if ($qF) {
     </a>
     <a href="akun.php" class="nav-item active">
       <i class="fa-solid fa-user"></i><span>Akun</span>
+    </a>
+    <a href="chat.php" class="nav-item">
+      <i class="fa-solid fa-message"></i><span>Chat</span>
     </a>
     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
       <a href="admin/dashboard.php" class="nav-item">

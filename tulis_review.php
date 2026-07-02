@@ -73,16 +73,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sudahDiulas) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tulis Ulasan - LokalThrift</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
     }
 
     body {
-      background: #f8fafc;
+      background: #eef5fc;
       color: #0d1c2e;
     }
 
@@ -92,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sudahDiulas) {
       display: flex;
       align-items: center;
       gap: 16px;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e0ecf8;
       position: sticky;
       top: 0;
       z-index: 10;
@@ -137,8 +140,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sudahDiulas) {
 
     .alert-info {
       background: #eff6ff;
-      color: #3b82f6;
-      border-left: 4px solid #3b82f6;
+      color: #2a85ff;
+      border-left: 4px solid #2a85ff;
     }
 
     .item-card {
@@ -155,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sudahDiulas) {
       align-items: center;
       margin-bottom: 20px;
       padding-bottom: 16px;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid #eef5fc;
     }
 
     .item-header img {
@@ -163,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sudahDiulas) {
       height: 64px;
       border-radius: 10px;
       object-fit: cover;
-      background: #f1f5f9;
+      background: #eef5fc;
     }
 
     .item-title {
@@ -174,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sudahDiulas) {
 
     .item-price {
       font-size: 13px;
-      color: #64748b;
+      color: #8fa3b8;
       font-weight: 600;
     }
 
@@ -202,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sudahDiulas) {
 
     .stars label {
       font-size: 28px;
-      color: #cbd5e1;
+      color: #c8dff5;
       cursor: pointer;
       transition: 0.2s;
     }
@@ -220,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sudahDiulas) {
     .form-group textarea {
       width: 100%;
       padding: 14px;
-      border: 1.5px solid #e2e8f0;
+      border: 1.5px solid #e0ecf8;
       border-radius: 12px;
       font-size: 14px;
       outline: none;
@@ -248,7 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sudahDiulas) {
     }
 
     .btn-submit:hover {
-      background: #1d4ed8;
+      background: #1b6be0;
     }
   </style>
 </head>
@@ -270,7 +273,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sudahDiulas) {
         <i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>
         Anda sudah memberikan ulasan untuk pesanan ini. Terima kasih!
       </div>
-      <a href="pesanan.php" class="btn-submit" style="display:block; text-align:center; text-decoration:none; background:#f1f5f9; color:#0d1c2e;">Kembali ke Pesanan</a>
+      <a href="pesanan.php" class="btn-submit" style="display:block; text-align:center; text-decoration:none; background:#eef5fc; color:#0d1c2e;">Kembali ke Pesanan</a>
     <?php else: ?>
       <form method="POST" action="tulis_review.php?id_pesanan=<?= $id_pesanan ?>">
 
